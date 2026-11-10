@@ -1,0 +1,15 @@
+services:
+  shipments-db:
+    image: postgres:17
+    container_name: shipments-db
+    environment:
+      POSTGRES_DB: shipments
+      POSTGRES_USER: delivery
+      POSTGRES_PASSWORD: delivery
+    ports:
+      - "5432:5432"
+    volumes:
+      - shipments-db-data:/var/lib/postgresql/data
+
+volumes:
+  shipments-db-data:
