@@ -10,6 +10,7 @@ Java 21 · Spring Boot 3 · PostgreSQL · Apache Kafka · Redis · Angular · Do
 
 ## Documentation
 
+- [Architecture](docs/architecture.md)
 - [Use cases](docs/use-cases.md)
 - [Class diagram](docs/class-diagram.md)
 - [Database](docs/database.md)

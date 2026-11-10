@@ -1,0 +1,97 @@
+@startuml component-diagram
+!pragma layout smetana
+skinparam shadowing false
+skinparam defaultTextAlignment center
+skinparam component {
+  BackgroundColor #F5F7FA
+  BorderColor #2F4A6D
+}
+skinparam database {
+  BackgroundColor #F5F7FA
+  BorderColor #2F4A6D
+}
+skinparam queue {
+  BackgroundColor #E7F1FB
+  BorderColor #2F4A6D
+}
+
+actor "Sender / Courier / Admin" as Users
+actor "Recipient" as Recipient
+
+component FE [
+**Angular Frontend**
+----
+Sender UI · Courier UI · Admin UI
+Public tracking page + live map
+]
+
+component SIM [
+**Courier Simulator**
+----
+sends demo locations
+]
+
+component NGINX [
+**Nginx**
+----
+reverse proxy
+single entry point
+]
+
+component SS [
+**Shipment Service**
+----
+Auth & users API (issues JWT)
+Shipment API
+Public tracking API
+Outbox publisher
+Dispatch event listener
+]
+
+component DS [
+**Dispatch Service**
+----
+Courier & zone API
+Assignment engine
+Location API
+Live location WebSocket
+Outbox publisher
+Shipment event listener
+]
+
+queue KAFKA [
+**Apache Kafka**
+----
+shipments
+dispatch
+courier-locations
+]
+
+database PG [
+**PostgreSQL**
+----
+shipments DB
+dispatch DB
+]
+
+database REDIS [
+**Redis**
+----
+last courier locations
+]
+
+Users --> FE
+Recipient --> FE
+FE --> NGINX : HTTPS / WebSocket
+SIM --> NGINX : POST locations
+
+NGINX --> SS : /api/auth\n/api/shipments\n/api/track
+NGINX --> DS : /api/dispatch\n/ws
+
+SS --> KAFKA : publish shipments\nconsume dispatch
+DS --> KAFKA : publish dispatch, locations\nconsume shipments, locations
+
+SS --> PG : shipments DB
+DS --> PG : dispatch DB
+DS --> REDIS : GEOADD / GEOSEARCH
+@enduml
