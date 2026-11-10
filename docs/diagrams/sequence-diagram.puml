@@ -1,0 +1,81 @@
+@startuml sequence-diagram
+skinparam shadowing false
+skinparam sequenceMessageAlign center
+skinparam participant {
+  BackgroundColor #F5F7FA
+  BorderColor #2F4A6D
+}
+skinparam queue {
+  BackgroundColor #E7F1FB
+  BorderColor #2F4A6D
+}
+
+actor Sender
+participant "Shipment\nService" as SS
+queue "Kafka" as K
+participant "Dispatch\nService" as DS
+database "Redis" as R
+actor Courier
+actor Recipient
+
+== 1. Shipment creation ==
+
+Sender -> SS : POST /api/shipments
+activate SS
+SS -> SS : save shipment (CREATED)\n+ history event\n+ outbox event\n**in one transaction**
+SS --> Sender : 201 Created\ntrackingNumber CT-2026-000123
+deactivate SS
+
+SS -> K : ShipmentCreated\n(outbox publisher)
+
+== 2. Courier assignment ==
+
+K -> DS : ShipmentCreated
+activate DS
+DS -> DS : skip if eventId already processed
+DS -> DS : find nearest zone\npick active courier\nwith fewest open shipments
+DS -> DS : save assignment + outbox event
+deactivate DS
+DS -> K : ShipmentAssigned
+K -> SS : ShipmentAssigned
+SS -> SS : status ASSIGNED\n+ history event
+
+== 3. Pickup ==
+
+Courier -> DS : confirm pickup
+DS -> K : ShipmentPickedUp
+K -> SS : ShipmentPickedUp
+SS -> SS : status PICKED_UP\n+ history event
+
+== 4. Out for delivery ==
+
+Courier -> DS : start delivery
+DS -> K : OutForDelivery
+K -> SS : OutForDelivery
+SS -> SS : status OUT_FOR_DELIVERY\n+ history event
+
+loop every few seconds
+  Courier -> DS : POST location
+  DS -> K : CourierLocationUpdated
+  K -> DS : CourierLocationUpdated
+  DS -> R : GEOADD last location
+  DS -> Recipient : WebSocket: courier position
+end
+
+Recipient -> SS : GET /api/track/CT-2026-000123
+SS --> Recipient : status + full history
+
+== 5. Delivery ==
+
+alt delivered
+  Courier -> DS : confirm delivery
+  DS -> K : ShipmentDelivered
+  K -> SS : ShipmentDelivered
+  SS -> SS : status DELIVERED\n+ history event
+else recipient not available
+  Courier -> DS : report failed delivery (reason)
+  DS -> K : DeliveryFailed
+  K -> SS : DeliveryFailed
+  SS -> SS : deliveryAttempts + 1\nback to PICKED_UP\n(RETURNED after 3rd attempt)
+end
+@enduml
