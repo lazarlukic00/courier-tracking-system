@@ -8,3 +8,10 @@ Sistem za kurirsku službu: pošiljalac kreira pošiljku, sistem je dodijeli kur
 
 1. Pokreni bazu: `docker compose up -d`
 2. Pokreni `shipment-service` iz IntelliJ-a (klasa `ShipmentServiceApplication`)
+
+
+
+
+## Documentation
+
+- [Use cases](docs/use-cases.md)
