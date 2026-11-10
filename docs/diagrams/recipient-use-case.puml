@@ -1,0 +1,28 @@
+@startuml recipient-use-case
+!pragma layout smetana
+left to right direction
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #F5F7FA
+  BorderColor #2F4A6D
+}
+
+actor "Recipient" as R
+
+rectangle "Courier Tracking System" {
+  usecase "Track shipment\nby tracking number" as UC1
+  usecase "View shipment\nhistory" as UC2
+  usecase "Track courier\non map" as UC3
+}
+
+R --> UC1
+
+UC1 .> UC2 : <<include>>
+UC3 .> UC1 : <<extend>>
+
+note right of UC3
+  Available only while
+  the shipment is out for delivery
+end note
+@enduml
