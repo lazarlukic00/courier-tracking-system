@@ -1,0 +1,45 @@
+@startuml admin-use-case
+!pragma layout smetana
+left to right direction
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #F5F7FA
+  BorderColor #2F4A6D
+}
+
+actor "Admin\n(dispatcher)" as A
+
+rectangle "Courier Tracking System" {
+  usecase "Log in" as UC1
+  usecase "Manage users" as UC2
+  usecase "Manage zones" as UC3
+  usecase "Manage couriers" as UC4
+  usecase "View all shipments" as UC5
+  usecase "Filter shipments\nby status" as UC6
+  usecase "Reassign courier" as UC7
+  usecase "View couriers\non map" as UC8
+  usecase "View statistics" as UC9
+}
+
+A --> UC1
+A --> UC2
+A --> UC3
+A --> UC4
+A --> UC5
+A --> UC8
+A --> UC9
+
+UC6 .> UC5 : <<extend>>
+UC7 .> UC5 : <<extend>>
+
+note right of UC7
+  Only before the courier
+  picks up the shipment
+end note
+
+note right of UC9
+  Deliveries per courier,
+  success rate, average time
+end note
+@enduml
