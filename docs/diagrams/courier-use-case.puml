@@ -1,0 +1,44 @@
+@startuml courier-use-case
+!pragma layout smetana
+left to right direction
+skinparam actorStyle awesome
+skinparam shadowing false
+skinparam usecase {
+  BackgroundColor #F5F7FA
+  BorderColor #2F4A6D
+}
+
+actor "Courier" as C
+
+rectangle "Courier Tracking System" {
+  usecase "Log in" as UC1
+  usecase "Start / end shift" as UC2
+  usecase "Share location" as UC3
+  usecase "View assigned\nshipments" as UC4
+  usecase "Confirm pickup" as UC5
+  usecase "Start delivery" as UC6
+  usecase "Confirm delivery" as UC7
+  usecase "Report failed\ndelivery" as UC8
+}
+
+C --> UC1
+C --> UC2
+C --> UC4
+
+UC2 .> UC3 : <<include>>
+
+UC5 .> UC4 : <<extend>>
+UC6 .> UC4 : <<extend>>
+UC7 .> UC4 : <<extend>>
+UC8 .> UC4 : <<extend>>
+
+note right of UC3
+  Sent automatically every
+  few seconds while on shift
+end note
+
+note right of UC8
+  Courier selects a reason
+  (recipient absent, wrong address...)
+end note
+@enduml
