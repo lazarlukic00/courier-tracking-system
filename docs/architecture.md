@@ -15,3 +15,9 @@ Courier locations follow a separate path. The courier app (or the simulator in t
 ![Sequence diagram](diagrams/sequence-diagram.png)
 
 The sender receives a tracking number immediately after creating a shipment; courier assignment happens asynchronously through Kafka, so the sender never waits for it. The Dispatch Service picks an active courier in the nearest zone and publishes `ShipmentAssigned`. From then on the courier interacts only with the Dispatch Service, and every step (pickup, out for delivery, delivered or failed) is published as an event that the Shipment Service turns into a new entry in the shipment history. While the shipment is out for delivery, courier locations flow through a separate topic into Redis and over WebSocket to the recipient, without passing through the Shipment Service.
+
+## Shipment lifecycle
+
+![State diagram](diagrams/state-diagram.png)
+
+A shipment can only move along the transitions shown above; every other change is rejected by the `Shipment` entity itself. A sender can cancel a shipment only before the courier picks it up. A failed delivery returns the shipment to `PICKED_UP` for another attempt the next day, and after the third failed attempt it is returned to the sender. `DELIVERED`, `RETURNED` and `CANCELLED` are final states.

@@ -1,0 +1,33 @@
+@startuml state-diagram
+skinparam shadowing false
+skinparam state {
+  BackgroundColor #F5F7FA
+  BorderColor #2F4A6D
+}
+
+[*] --> CREATED : sender creates shipment
+
+CREATED --> CREATED : NoCourierAvailable\n(retry later)
+CREATED --> ASSIGNED : ShipmentAssigned
+CREATED --> CANCELLED : sender cancels
+
+ASSIGNED --> ASSIGNED : admin reassigns courier
+ASSIGNED --> PICKED_UP : courier confirms pickup
+ASSIGNED --> CANCELLED : sender cancels
+
+PICKED_UP --> OUT_FOR_DELIVERY : courier starts delivery
+
+OUT_FOR_DELIVERY --> DELIVERED : courier confirms delivery
+OUT_FOR_DELIVERY --> PICKED_UP : delivery failed\n[attempts < 3]
+OUT_FOR_DELIVERY --> RETURNED : delivery failed\n[3rd attempt]
+
+DELIVERED --> [*]
+RETURNED --> [*]
+CANCELLED --> [*]
+
+note right of CANCELLED
+  Only possible before
+  the courier picks up
+  the shipment
+end note
+@enduml
