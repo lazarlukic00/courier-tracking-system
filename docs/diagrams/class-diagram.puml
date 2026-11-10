@@ -1,0 +1,124 @@
+@startuml class-diagram
+!pragma layout smetana
+skinparam shadowing false
+skinparam classAttributeIconSize 0
+skinparam class {
+  BackgroundColor #F5F7FA
+  BorderColor #2F4A6D
+}
+skinparam package {
+  BorderColor #2F4A6D
+}
+
+package "Shipment Service" {
+
+  enum Role {
+    SENDER
+    COURIER
+    ADMIN
+  }
+
+  class User {
+    - id : Long
+    - email : String
+    - passwordHash : String
+    - fullName : String
+    - role : Role
+    - active : boolean
+    - createdAt : Instant
+  }
+
+  enum ShipmentStatus {
+    CREATED
+    ASSIGNED
+    PICKED_UP
+    OUT_FOR_DELIVERY
+    DELIVERED
+    RETURNED
+    CANCELLED
+  }
+
+  class Shipment {
+    - id : Long
+    - trackingNumber : String
+    - recipientName : String
+    - recipientPhone : String
+    - recipientAddress : String
+    - recipientLat : double
+    - recipientLng : double
+    - weightKg : BigDecimal
+    - note : String
+    - status : ShipmentStatus
+    - courierId : Long
+    - deliveryAttempts : int
+    - createdAt : Instant
+    - version : Long
+    + cancel() : void
+    + assignCourier(courierId : Long) : void
+    + markDelivered() : void
+    + registerFailedAttempt(reason : String) : void
+  }
+
+  class ShipmentEvent {
+    - id : Long
+    - status : ShipmentStatus
+    - description : String
+    - occurredAt : Instant
+  }
+}
+
+package "Dispatch Service" {
+
+  class Zone {
+    - id : Long
+    - name : String
+    - centerLat : double
+    - centerLng : double
+  }
+
+  enum CourierStatus {
+    ACTIVE
+    OFF_DUTY
+  }
+
+  class Courier {
+    - id : Long
+    - userId : Long
+    - fullName : String
+    - phone : String
+    - status : CourierStatus
+    - version : Long
+  }
+
+  enum AssignmentStatus {
+    ASSIGNED
+    PICKED_UP
+    OUT_FOR_DELIVERY
+    DELIVERED
+    FAILED
+    CANCELLED
+  }
+
+  class Assignment {
+    - id : Long
+    - shipmentId : Long
+    - status : AssignmentStatus
+    - assignedAt : Instant
+    - pickedUpAt : Instant
+    - finishedAt : Instant
+  }
+}
+
+User "1" -- "0..*" Shipment : sends >
+Shipment "1" *-- "1..*" ShipmentEvent : history >
+
+Zone "1" -- "0..*" Courier : contains >
+Courier "1" -- "0..*" Assignment : handles >
+
+Courier ..> User : userId
+Assignment ..> Shipment : shipmentId
+note on link
+  ID only: separate databases,
+  communication through Kafka
+end note
+@enduml

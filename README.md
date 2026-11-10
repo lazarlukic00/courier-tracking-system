@@ -15,3 +15,5 @@ Sistem za kurirsku službu: pošiljalac kreira pošiljku, sistem je dodijeli kur
 ## Documentation
 
 - [Use cases](docs/use-cases.md)
+
+- [Database](docs/database.md)
