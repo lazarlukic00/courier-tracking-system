@@ -1,6 +1,6 @@
 # Database
 
-![ER diagram](diagrams/class_diagram.png)
+![ER diagram](diagrams/er-diagram.png)
 
 The system uses one PostgreSQL server with two separate databases, `shipments` and `dispatch`. Each service connects with its own database user and can access only its own database, so services never read each other's tables. References between the databases (`assignments.shipment_id`, `couriers.user_id`) are plain columns without foreign key constraints; consistency between them is kept through Kafka events.
 

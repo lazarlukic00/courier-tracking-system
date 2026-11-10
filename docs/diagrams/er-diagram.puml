@@ -1,0 +1,129 @@
+@startuml er-diagram
+!pragma layout smetana
+hide circle
+skinparam linetype ortho
+skinparam shadowing false
+skinparam class {
+  BackgroundColor #F5F7FA
+  BorderColor #2F4A6D
+}
+skinparam package {
+  BorderColor #2F4A6D
+}
+
+package "Database: shipments" {
+
+  entity users {
+    * id : BIGSERIAL <<PK>>
+    --
+    * email : VARCHAR(255) <<UNIQUE>>
+    * password_hash : VARCHAR(255)
+    * full_name : VARCHAR(255)
+    * role : VARCHAR(20)
+    * active : BOOLEAN
+    * created_at : TIMESTAMPTZ
+  }
+
+  entity shipments {
+    * id : BIGSERIAL <<PK>>
+    --
+    * tracking_number : VARCHAR(20) <<UNIQUE>>
+    * sender_id : BIGINT <<FK>>
+    * recipient_name : VARCHAR(255)
+    * recipient_phone : VARCHAR(30)
+    * recipient_address : VARCHAR(500)
+    * recipient_lat : DOUBLE PRECISION
+    * recipient_lng : DOUBLE PRECISION
+    * weight_kg : NUMERIC(6,2)
+    note : VARCHAR(500)
+    * status : VARCHAR(30)
+    courier_id : BIGINT
+    * delivery_attempts : INT
+    * created_at : TIMESTAMPTZ
+    * version : BIGINT
+  }
+
+  entity shipment_events {
+    * id : BIGSERIAL <<PK>>
+    --
+    * shipment_id : BIGINT <<FK>>
+    * status : VARCHAR(30)
+    description : VARCHAR(500)
+    * occurred_at : TIMESTAMPTZ
+  }
+
+  entity "outbox_events" as s_outbox {
+    * id : UUID <<PK>>
+    --
+    * aggregate_id : BIGINT
+    * event_type : VARCHAR(100)
+    * payload : JSONB
+    * created_at : TIMESTAMPTZ
+    * sent : BOOLEAN
+  }
+
+  entity "processed_events" as s_processed {
+    * event_id : UUID <<PK>>
+    --
+    * processed_at : TIMESTAMPTZ
+  }
+}
+
+package "Database: dispatch" {
+
+  entity zones {
+    * id : BIGSERIAL <<PK>>
+    --
+    * name : VARCHAR(100) <<UNIQUE>>
+    * center_lat : DOUBLE PRECISION
+    * center_lng : DOUBLE PRECISION
+  }
+
+  entity couriers {
+    * id : BIGSERIAL <<PK>>
+    --
+    * user_id : BIGINT <<UNIQUE>>
+    * zone_id : BIGINT <<FK>>
+    * full_name : VARCHAR(255)
+    * phone : VARCHAR(30)
+    * status : VARCHAR(20)
+    * version : BIGINT
+  }
+
+  entity assignments {
+    * id : BIGSERIAL <<PK>>
+    --
+    * shipment_id : BIGINT
+    * courier_id : BIGINT <<FK>>
+    * status : VARCHAR(30)
+    * assigned_at : TIMESTAMPTZ
+    picked_up_at : TIMESTAMPTZ
+    finished_at : TIMESTAMPTZ
+  }
+
+  entity "outbox_events" as d_outbox {
+    * id : UUID <<PK>>
+    --
+    * aggregate_id : BIGINT
+    * event_type : VARCHAR(100)
+    * payload : JSONB
+    * created_at : TIMESTAMPTZ
+    * sent : BOOLEAN
+  }
+
+  entity "processed_events" as d_processed {
+    * event_id : UUID <<PK>>
+    --
+    * processed_at : TIMESTAMPTZ
+  }
+}
+
+users ||--o{ shipments : sender_id
+shipments ||--|{ shipment_events : shipment_id
+
+zones ||--o{ couriers : zone_id
+couriers ||--o{ assignments : courier_id
+
+assignments }o..|| shipments : shipment_id (no FK)
+couriers |o..|| users : user_id (no FK)
+@enduml

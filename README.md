@@ -1,19 +1,20 @@
 # Courier Tracking System
 
-Sistem za kurirsku službu: pošiljalac kreira pošiljku, sistem je dodijeli kuriru iz zone primaoca, a primalac preko broja za praćenje vidi istoriju pošiljke i kurira na mapi uživo.
+A courier service platform: a sender creates a shipment, the system assigns it to a courier in the recipient's zone, and the recipient follows the shipment history and the courier's live location on a map using a tracking number.
 
-> U izradi. Trenutno: faza 0 (dijagrami u `docs/diagrams`).
+> 🚧 Work in progress. Current phase: system design (diagrams in `docs/diagrams`).
 
-## Pokretanje
+## Tech stack
 
-1. Pokreni bazu: `docker compose up -d`
-2. Pokreni `shipment-service` iz IntelliJ-a (klasa `ShipmentServiceApplication`)
-
-
-
+Java 21 · Spring Boot 3 · PostgreSQL · Apache Kafka · Redis · Angular · Docker
 
 ## Documentation
 
 - [Use cases](docs/use-cases.md)
-
+- [Class diagram](docs/class-diagram.md)
 - [Database](docs/database.md)
+
+## Running locally
+
+1. Start the database: `docker compose up -d`
+2. Run `shipment-service` from IntelliJ (`ShipmentServiceApplication`)
