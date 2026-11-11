@@ -15,6 +15,7 @@ Java 21 · Spring Boot 3 · PostgreSQL · Apache Kafka · Redis · Angular · Do
 - [Class diagram](docs/class-diagram.md)
 - [Database](docs/database.md)
 
+
 ## Running locally
 
 1. Start the database: `docker compose up -d`

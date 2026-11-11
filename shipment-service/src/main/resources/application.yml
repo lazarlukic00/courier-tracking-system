@@ -3,11 +3,11 @@ spring:
     name: shipment-service
   datasource:
     url: ${DB_URL:jdbc:postgresql://localhost:5432/shipments}
-    username: ${DB_USER:delivery}
-    password: ${DB_PASSWORD:delivery}
+    username: ${DB_USER:shipment_user}
+    password: ${DB_PASSWORD:shipment_pass}
   jpa:
     hibernate:
-      ddl-auto: validate   # šemu pravi Flyway, Hibernate je samo provjerava
+      ddl-auto: validate   # schema is managed by Flyway, Hibernate only validates it
     open-in-view: false
   flyway:
     enabled: true

@@ -1,15 +1,16 @@
 services:
-  shipments-db:
+  postgres:
     image: postgres:17
-    container_name: shipments-db
+    container_name: courier-postgres
     environment:
       POSTGRES_DB: shipments
-      POSTGRES_USER: delivery
-      POSTGRES_PASSWORD: delivery
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
     ports:
       - "5432:5432"
     volumes:
-      - shipments-db-data:/var/lib/postgresql/data
+      - postgres-data:/var/lib/postgresql/data
+      - ./docker/postgres/init.sql:/docker-entrypoint-initdb.d/init.sql:ro
 
 volumes:
-  shipments-db-data:
+  postgres-data:
