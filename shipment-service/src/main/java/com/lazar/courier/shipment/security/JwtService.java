@@ -1,6 +1,7 @@
 package com.lazar.courier.shipment.security;
 
 import com.lazar.courier.shipment.user.User;
+import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
@@ -37,8 +38,8 @@ public class JwtService {
                 .compact();
     }
 
-    public void parseToken(String token) {
-        Jwts.parser()
+    public Claims parseToken(String token) {
+        return Jwts.parser()
                 .verifyWith(key)
                 .build()
                 .parseSignedClaims(token)
