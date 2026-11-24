@@ -1,0 +1,31 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  shipment-service:
+    name: Shipment Service
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: shipment-service
+
+    steps:
+      - name: Check out code
+        uses: actions/checkout@v4
+
+      - name: Set up Java 21
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '21'
+          cache: maven
+          cache-dependency-path: shipment-service/pom.xml
+
+      - name: Build and run tests
+        run: mvn -B verify

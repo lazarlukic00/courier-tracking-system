@@ -1,5 +1,7 @@
 # Courier Tracking System
 
+![CI](https://github.com/lazarlukic00/courier-tracking-system/actions/workflows/ci.yml/badge.svg)
+
 A courier service platform: a sender creates a shipment, the system assigns it to a courier in the recipient's zone, and the recipient follows the shipment history and the courier's live location on a map using a tracking number.
 
 > 🚧 Work in progress. Current phase: system design (diagrams in `docs/diagrams`).
